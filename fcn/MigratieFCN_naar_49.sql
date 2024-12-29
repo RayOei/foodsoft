@@ -35,7 +35,7 @@
  * 
  * When done: compare the newly created schema with a clean v4.9 to be sure they align. Correct when needed and rerun the script on a fork DB
  * 
- * Some tricks, run `mysqldump --compact --add-drop-table --no-data --quick foodsoft_db > fs_db.sql` for both this newly migrated DB and the clean v49 one.
+ * Some tricks, run `mariadb-dump --compact --add-drop-table --no-data --quick foodsoft_db > fs_db.sql` for both this newly migrated DB and the clean v49 one.
  * Use a file compare to check the difference. 
  * The only differences which can be safely ignored are the `ENGINE=InnoDB AUTO_INCREMENT=<42>` ones as they are expected.   
  * 

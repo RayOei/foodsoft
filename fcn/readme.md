@@ -9,6 +9,7 @@ Notities voor FCN (FoodCoopNoord) installatie van FS ten bate van DB migratie na
     - [FS development](#fs-development)
     - [Run FS](#run-fs)
   - [3. Migratie](#3-migratie)
+    - [Tips](#tips)
   - [4. Nuttige tools](#4-nuttige-tools)
 
 
@@ -145,11 +146,16 @@ Start `foodsoft`
 bundle exec rails s
 ```
 
+Open [FS](http://localhost:3000)
+
 Voor externe toegang:
 
 ```bash
 bundle exec rails s --binding=0.0.0.0
 ```
+
+Open FS van (http://<ipadres>:3000) van een andere machine in je netwerk.
+
 
 ##  3. Migratie
 
@@ -161,15 +167,56 @@ Zie de aanwijzingen in het [script](./MigratieFCN_naar_49.sql)
 
 Run de FS migratie.
 
+```bash
+# env definitie uit database.yml: development of test
+bin/rails db:migrate RAILS_ENV=<env> 
+```
+
 Controleer resultaat.
 
-Start FS en controleer de werking.
+Start FS en controleer de werking, [zie](#run-fs)
 
-Als alles naar verwachting is verlopen zou er een werkende FS v4.9 moeten zijn met de gemigreerde data.
+Als alles naar verwachting is verlopen zou er een [werkende FS v4.9](http://localhost:3000) moeten zijn met de gemigreerde data.
 
 Dit is nog steeds op `development`! Dat betekent dat externe diensten, zoals emaill en Mollie, niet beschikbaar zijn. 
 
 Dat moet nog verder geconfigureerd worden.
+
+### Tips
+
+Dump db schema
+
+```bash
+mariadb-dump --compact --add-drop-table --no-data --quick foodsoft_db > fs_db.sql
+```
+
+Voor het toevoegen van de development admin aan de gemigreerde database.
+
+```sql
+insert into foodsoft_adam.users (nick, password_hash, password_salt, first_name, last_name, email, created_on)
+	select "fcn_admin", password_hash, password_salt, first_name, last_name, email, NOW() 
+      from foodsoft_development.users b 
+      where b.id = 1; 
+
+-- 801 is de group_id voor system. Pas aan naar behoefte
+insert into memberships (user_id, group_id) values (<nieuwe user id>, 801);
+```
+
+Check collating
+
+```sql
+SELECT *
+FROM information_schema.COLUMNS 
+WHERE TABLE_SCHEMA = 'foodsoft_adam'
+AND DATA_TYPE = 'varchar' or DATA_TYPE = 'text'
+AND COLUMN_DEFAULT IS NOT NULL
+AND
+(
+    CHARACTER_SET_NAME != 'utf8mb4'
+    OR
+    COLLATION_NAME != 'utf8mb4_general_ci'
+);
+```
 
 ##  4. Nuttige tools
 
