@@ -9,15 +9,32 @@ class AddPaymentToFinancialTransaction < ActiveRecord::Migration[7.0]
       end
     end
 
-    add_column :financial_transactions, :updated_on, :timestamp
-    add_column :financial_transactions, :payment_method, :string
-    add_column :financial_transactions, :payment_plugin, :string
-    add_column :financial_transactions, :payment_id, :string
-    add_column :financial_transactions, :payment_amount, :decimal, precision: 8, scale: 3
-    add_column :financial_transactions, :payment_currency, :string
-    add_column :financial_transactions, :payment_state, :string
-    add_column :financial_transactions, :payment_fee, :decimal, precision: 8, scale: 3
-
-    add_index :financial_transactions, %i[payment_plugin payment_id]
+    unless ActiveRecord::Base.connection.column_exists?(:financial_transactions, :updated_on)    
+      add_column :financial_transactions, :updated_on, :timestamp
+    end
+    unless ActiveRecord::Base.connection.column_exists?(:financial_transactions, :payment_method)    
+      add_column :financial_transactions, :payment_method, :string
+    end
+    unless ActiveRecord::Base.connection.column_exists?(:financial_transactions, :payment_plugin)    
+      add_column :financial_transactions, :payment_plugin, :string
+    end
+    unless ActiveRecord::Base.connection.column_exists?(:financial_transactions, :payment_id)    
+      add_column :financial_transactions, :payment_id, :string
+    end
+    unless ActiveRecord::Base.connection.column_exists?(:financial_transactions, :payment_amount)    
+      add_column :financial_transactions, :payment_amount, :decimal, precision: 8, scale: 3
+    end
+    unless ActiveRecord::Base.connection.column_exists?(:financial_transactions, :payment_currency)    
+      add_column :financial_transactions, :payment_currency, :string
+    end
+    unless ActiveRecord::Base.connection.column_exists?(:financial_transactions, :payment_state)    
+      add_column :financial_transactions, :payment_state, :string
+    end
+    unless ActiveRecord::Base.connection.column_exists?(:financial_transactions, :payment_fee)    
+      add_column :financial_transactions, :payment_fee, :decimal, precision: 8, scale: 3
+    end
+    unless ActiveRecord::Base.connection.index_exists?(:financial_transactions, %i[payment_plugin payment_id])    
+      add_index :financial_transactions, %i[payment_plugin payment_id]
+    end
   end
 end
