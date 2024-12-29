@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
+ActiveRecord::Schema[7.0].define(version: 2024_04_10_093313) do
   create_table "action_text_rich_texts", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.text "body", size: :long
@@ -21,7 +21,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
     t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
   end
 
-  create_table "active_storage_attachments", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
     t.bigint "record_id", null: false
@@ -31,7 +31,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
-  create_table "active_storage_blobs", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "active_storage_blobs", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "key", null: false
     t.string "filename", null: false
     t.string "content_type"
@@ -44,7 +44,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
   end
 
   create_table "active_storage_variant_records", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
-    t.integer "blob_id", null: false
+    t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
@@ -163,10 +163,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
     t.text "note", null: false
     t.integer "user_id", default: 0, null: false
     t.datetime "created_on", precision: nil, null: false
-    t.integer "financial_transaction_type_id", null: false
-    t.integer "financial_link_id"
-    t.integer "reverts_id"
-    t.integer "group_order_id"
     t.timestamp "updated_on"
     t.string "payment_method"
     t.string "payment_plugin"
@@ -175,6 +171,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
     t.string "payment_currency"
     t.string "payment_state"
     t.decimal "payment_fee", precision: 8, scale: 3
+    t.integer "financial_transaction_type_id", null: false
+    t.integer "financial_link_id"
+    t.integer "reverts_id"
+    t.integer "group_order_id"
+    t.index ["financial_link_id"], name: "index_financial_transactions_on_financial_link_id"
     t.index ["ordergroup_id"], name: "index_financial_transactions_on_ordergroup_id"
     t.index ["payment_plugin", "payment_id"], name: "index_financial_transactions_on_payment_plugin_and_payment_id"
     t.index ["reverts_id"], name: "index_financial_transactions_on_reverts_id", unique: true
@@ -261,6 +262,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
     t.datetime "updated_at", precision: nil
     t.integer "created_by_user_id"
     t.integer "financial_link_id"
+    t.index ["financial_link_id"], name: "index_invoices_on_financial_link_id"
     t.index ["supplier_id"], name: "index_invoices_on_supplier_id"
   end
 
@@ -504,7 +506,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
   create_table "supplier_categories", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
-    t.integer "financial_transaction_class_id"
+    t.integer "financial_transaction_class_id", null: false
     t.integer "bank_account_id"
   end
 
@@ -526,7 +528,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
     t.datetime "deleted_at", precision: nil
     t.string "shared_sync_method"
     t.string "iban"
-    t.integer "supplier_category_id"
+    t.integer "supplier_category_id", null: false
     t.index ["name"], name: "index_suppliers_on_name", unique: true
   end
 
@@ -566,5 +568,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_26_124329) do
     t.index ["nick"], name: "index_users_on_nick", unique: true
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
 end
