@@ -139,7 +139,7 @@ bundle exec rails s --binding=0.0.0.0
 
 ## Migratie
 
-Restore een database van de FoodCoopAdam installie, hier `foodcoop_adam` genoemd.
+Restore een database van de FoodCoopAdam installie, hier `foodsoft_adam` genoemd.
 
 Run het FCN migratie script dat de database aanpast voordat de Foodsoft migratie plaatsvindt. Dit zorgt ervoor dat de database in een staat is waarbij de FS migratie niet faalt, terwijl zoveel mogelijk data behouden blijft.
 
