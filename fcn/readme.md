@@ -1,12 +1,22 @@
-# FCN
+# FCN- [FCN](#fcn)
 
-Notities voor FCN (FoodCoopNoord)
+Notities voor FCN (FoodCoopNoord) installatie van FS ten bate van DB migratie naar upstream versie.
 
-## Ubuntu
+- [FCN- FCN](#fcn--fcn)
+  - [1. Ubuntu](#1-ubuntu)
+  - [2. MariaDB](#2-mariadb)
+    - [Gebruikers](#gebruikers)
+    - [FS development](#fs-development)
+    - [Run FS](#run-fs)
+  - [3. Migratie](#3-migratie)
+  - [4. Nuttige tools](#4-nuttige-tools)
+
+
+##  1. Ubuntu
 
 Ubuntu 24.04 LTS
 
-## MariaDB
+##  2. MariaDB
 
 Installeer. Ten tijde van schrijven `v10.11.8-MariaDB-0ubuntu.24.04.1`
 
@@ -30,6 +40,8 @@ Login als `root`
 sudo mariadb
 ```
 
+### Gebruikers
+
 Voeg de admingebruiker toe en geef die alle rechten, inclusief het recht rechten te zetten!
 
 ```sql
@@ -43,6 +55,8 @@ Controleer of deze gebruiker `MariaDB` kan opstarten.
 ```bash
 mariadb
 ```
+
+### FS development
 
 Volg [instructies](../doc/SETUP_DEVELOPMENT.md)
 
@@ -123,7 +137,7 @@ SHOW DATABASES
 De lijst met databases moet nu ook `foodsoft_test` bevatten die door het script is aangemaakt.
 Een `show tables` zou nu een gevulde `foodsoft_development` moeten tonen.
 
-> TIP. De tool [DBeaver-CE](https:\\www.dbeaver.io) is nuttig, en gratis, voor een GUI om met de database direct te werken.
+### Run FS
 
 Start `foodsoft`
 
@@ -137,13 +151,13 @@ Voor externe toegang:
 bundle exec rails s --binding=0.0.0.0
 ```
 
-## Migratie
+##  3. Migratie
 
 Restore een database van de FoodCoopAdam installie, hier `foodsoft_adam` genoemd.
 
 Run het FCN migratie script dat de database aanpast voordat de Foodsoft migratie plaatsvindt. Dit zorgt ervoor dat de database in een staat is waarbij de FS migratie niet faalt, terwijl zoveel mogelijk data behouden blijft.
 
-Zie de aanwijzingen in het [script](../)
+Zie de aanwijzingen in het [script](./MigratieFCN_naar_49.sql)
 
 Run de FS migratie.
 
@@ -156,3 +170,8 @@ Als alles naar verwachting is verlopen zou er een werkende FS v4.9 moeten zijn m
 Dit is nog steeds op `development`! Dat betekent dat externe diensten, zoals emaill en Mollie, niet beschikbaar zijn. 
 
 Dat moet nog verder geconfigureerd worden.
+
+##  4. Nuttige tools
+
+- Visual file compare [Kompare](https://invent.kde.org/sdk/kompare)
+- Database tool [DBeaver-CE](https:\\www.dbeaver.io)
