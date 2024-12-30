@@ -248,7 +248,7 @@ ALTER table foodsoft_adam.orders
 
 ALTER TABLE foodsoft_adam.orders
 	-- ADD invoice_id int DEFAULT NULL, 
-	DROP COLUMN IF EXISTS pickup,
+	-- DROP COLUMN IF EXISTS pickup,
 	DROP COLUMN IF EXISTS scope,
 	DROP INDEX IF EXISTS index_orders_on_scope;
 
@@ -378,7 +378,9 @@ ORDER by table_name;
 */
 
 -- Final set used (do check!!)
-
+/**
+ * 
+ *
 ALTER TABLE `articles` MODIFY `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `articles` MODIFY `unit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `articles` MODIFY `note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
@@ -386,7 +388,7 @@ ALTER TABLE `articles` MODIFY `manufacturer` varchar(255) CHARACTER SET utf8mb4 
 ALTER TABLE `articles` MODIFY `origin` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `articles` MODIFY `order_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `articles` MODIFY `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
-ALTER TABLE `article_categories` MODIFY `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
+ALTER TABLE `article_categories` MODIFY `namfe` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `article_categories` MODIFY `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `deliveries` MODIFY `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `financial_transactions` MODIFY `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
@@ -442,5 +444,5 @@ ALTER TABLE `users` MODIFY `email` varchar(255) CHARACTER SET utf8mb4 COLLATE ut
 ALTER TABLE `users` MODIFY `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `users` MODIFY `reset_password_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 
-
+*/
 
