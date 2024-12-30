@@ -1,23 +1,24 @@
-# FCN- [FCN](#fcn)
+# FoodCoopNoord
 
 Notities voor FCN (FoodCoopNoord) installatie van FS ten bate van DB migratie naar upstream versie.
 
-- [FCN- FCN](#fcn--fcn)
-  - [1. Ubuntu](#1-ubuntu)
-  - [2. MariaDB](#2-mariadb)
+Uitgaande van database behorende bij [foodcoop-adam](https://github.com/foodcoop-adam/foodsoft) `v3.4.0+adam+B`
+
+- [FoodCoopNoord](#foodcoopnoord)
+  - [Ubuntu](#ubuntu)
+  - [MariaDB](#mariadb)
     - [Gebruikers](#gebruikers)
     - [FS development](#fs-development)
     - [Run FS](#run-fs)
-  - [3. Migratie](#3-migratie)
+  - [Migratie](#migratie)
     - [Tips](#tips)
-  - [4. Nuttige tools](#4-nuttige-tools)
+  - [Nuttige tools](#nuttige-tools)
 
-
-##  1. Ubuntu
+## Ubuntu
 
 Ubuntu 24.04 LTS
 
-##  2. MariaDB
+## MariaDB
 
 Installeer. Ten tijde van schrijven `v10.11.8-MariaDB-0ubuntu.24.04.1`
 
@@ -156,8 +157,7 @@ bundle exec rails s --binding=0.0.0.0
 
 Open FS van (http://<ipadres>:3000) van een andere machine in je netwerk.
 
-
-##  3. Migratie
+## Migratie
 
 Restore een database van de FoodCoopAdam installie, hier `foodsoft_adam` genoemd.
 
@@ -218,7 +218,7 @@ AND
 );
 ```
 
-##  4. Nuttige tools
+## Nuttige tools
 
 - Visual file compare [Kompare](https://invent.kde.org/sdk/kompare)
 - Database tool [DBeaver-CE](https:\\www.dbeaver.io)
