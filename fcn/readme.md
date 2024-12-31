@@ -194,12 +194,17 @@ Voor het toevoegen van de development admin aan de gemigreerde database.
 
 ```sql
 insert into foodsoft_adam.users (nick, password_hash, password_salt, first_name, last_name, email, created_on)
-	select "fcn_admin", password_hash, password_salt, first_name, last_name, email, NOW() 
+   select "fcn_admin", password_hash, password_salt, first_name, last_name, email, NOW() 
       from foodsoft_development.users b 
       where b.id = 1; 
 
--- 801 is de group_id voor system. Pas aan naar behoefte
-insert into memberships (user_id, group_id) values (<nieuwe user id>, 801);
+-- Pas aan naar behoefte - ID's gebaseerd op FCN db
+insert into memberships (user_id, group_id) values (<nieuwe user id>, 1); -- Lijstverwerkers / System admin
+insert into memberships (user_id, group_id) values (<nieuwe user id>, 533); -- Uitgiftecoördinatoren
+insert into memberships (user_id, group_id) values (<nieuwe user id>, 534); -- Bestelteam
+insert into memberships (user_id, group_id) values (<nieuwe user id>, 536); -- Bestuur
+insert into memberships (user_id, group_id) values (<nieuwe user id>, 801); -- Systeem
+insert into memberships (user_id, group_id) values (<nieuwe user id>, 820); -- Ledenadministratie
 ```
 
 Check collating
