@@ -379,9 +379,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_04_10_093313) do
     t.integer "updated_by_user_id"
     t.decimal "foodcoop_result", precision: 8, scale: 2
     t.integer "created_by_user_id"
+    t.date "pickup"
     t.datetime "boxfill", precision: nil
     t.integer "invoice_id"
-    t.date "pickup"
     t.datetime "last_sent_mail", precision: nil
     t.integer "end_action", default: 0, null: false
     t.decimal "transport", precision: 8, scale: 2

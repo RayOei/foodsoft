@@ -26,8 +26,10 @@
  * 			-- Differences ?: add actions to _this_ script
  * 		-- compare schemas from clean development and resulting db
  * 			-- Differences ?: add actions to _this_ script
+ * - !! REVERT changed db/schema/db !! and make sure the version is as v4.9 requires !!
  * - Rinse - restore original foodsoft_adam db
- * - Repeat until no meaningfull differences are found
+ * - ------------------------------------------------------------------------------------------
+ * - REPEAT until no meaningfull differences are found (like columns in different order)
  * - Start application and check if all runs as expected
  * --------------------------------------------------------------------------------------------
  * 
@@ -57,10 +59,15 @@
  * ????? FK defs after migration but not in clean install. How?
  * ?????? BUG in schema for STOCK_EVENTS collating on swedish. Correct for table AND type column
  * */
- 
+
+-- MariaDB > v11.6.0 has this by default 
+SET character_set_server = 'utf8mb4';
+SET collation_server = 'utf8mb4_general_ci';
+
+SELECT * FROM information_schema.SCHEMATA;
+
 -- Explicit to force error when on the wrong connection
 USE foodsoft_adam;
-
 -- ---------------
 
 START TRANSACTION;
@@ -248,7 +255,7 @@ ALTER table foodsoft_adam.orders
 
 ALTER TABLE foodsoft_adam.orders
 	-- ADD invoice_id int DEFAULT NULL, 
-	-- DROP COLUMN IF EXISTS pickup,
+	MODIFY COLUMN IF EXISTS pickup date DEFAULT NULL,
 	DROP COLUMN IF EXISTS scope,
 	DROP INDEX IF EXISTS index_orders_on_scope;
 
@@ -316,7 +323,7 @@ ALTER table foodsoft_adam.suppliers
 	COLLATE = utf8mb4_general_ci;
 
 ALTER table foodsoft_adam.suppliers
-	-- MODIFY COLUMN supplier_category_id int(11) DEFAULT NULL,
+	MODIFY COLUMN supplier_category_id int(11) DEFAULT NULL,
 	DROP COLUMN IF EXISTS article_info_url,
 	DROP COLUMN IF EXISTS scope,
 	DROP COLUMN IF EXISTS use_tolerance,
@@ -355,7 +362,8 @@ COMMIT;
  * */
 
 -- -----------------------------------------------------------------------------------------------
-
+-- !! AFTER RUNNING RAKE MIGRATION -- 
+-- -----------------------------------------------------------------------------------------------
 
 /*
  *  HELPER to generate modify for collating. 
@@ -375,12 +383,13 @@ WHERE TABLE_SCHEMA = 'foodsoft_adam'
 	AND  COLLATION_NAME != 'utf8mb4_general_ci'
 ORDER by table_name;
 
-*/
 
 -- Final set used (do check!!)
-/**
- * 
- *
+
+ALTER table foodsoft_adam.stock_events 
+	CHARACTER SET utf8mb4,
+	COLLATE = utf8mb4_general_ci;
+
 ALTER TABLE `articles` MODIFY `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `articles` MODIFY `unit` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `articles` MODIFY `note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
@@ -388,15 +397,9 @@ ALTER TABLE `articles` MODIFY `manufacturer` varchar(255) CHARACTER SET utf8mb4 
 ALTER TABLE `articles` MODIFY `origin` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `articles` MODIFY `order_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `articles` MODIFY `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
-ALTER TABLE `article_categories` MODIFY `namfe` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
+ALTER TABLE `article_categories` MODIFY `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `article_categories` MODIFY `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
-ALTER TABLE `deliveries` MODIFY `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `financial_transactions` MODIFY `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
-ALTER TABLE `financial_transactions` MODIFY `payment_method` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
-ALTER TABLE `financial_transactions` MODIFY `payment_plugin` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
-ALTER TABLE `financial_transactions` MODIFY `payment_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
-ALTER TABLE `financial_transactions` MODIFY `payment_currency` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
-ALTER TABLE `financial_transactions` MODIFY `payment_state` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `groups` MODIFY `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `groups` MODIFY `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `groups` MODIFY `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
@@ -420,6 +423,8 @@ ALTER TABLE `schema_migrations` MODIFY `version` varchar(255) CHARACTER SET utf8
 ALTER TABLE `settings` MODIFY `var` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
 ALTER TABLE `settings` MODIFY `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `settings` MODIFY `thing_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
+ALTER TABLE `stock_events` MODIFY `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
+ALTER TABLE `stock_events` MODIFY `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
 ALTER TABLE `suppliers` MODIFY `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `suppliers` MODIFY `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
 ALTER TABLE `suppliers` MODIFY `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' NOT NULL;
@@ -444,5 +449,7 @@ ALTER TABLE `users` MODIFY `email` varchar(255) CHARACTER SET utf8mb4 COLLATE ut
 ALTER TABLE `users` MODIFY `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `users` MODIFY `reset_password_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 
-*/
-
+ALTER TABLE active_storage_blobs MODIFY `service_name` varchar(255) NOT NULL;
+ALTER TABLE supplier_categories MODIFY `financial_transaction_class_id` int(11) NOT NULL;
+ALTER TABLE suppliers MODIFY `supplier_category_id` int(11) NOT NULL;
+ */
