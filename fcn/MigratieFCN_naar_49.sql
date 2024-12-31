@@ -449,7 +449,28 @@ ALTER TABLE `users` MODIFY `email` varchar(255) CHARACTER SET utf8mb4 COLLATE ut
 ALTER TABLE `users` MODIFY `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 ALTER TABLE `users` MODIFY `reset_password_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
 
+
+-- --------------------------------------------------------------------------------------------------
+-- !! CORRECTIONS AS some migration changes are not applied
+
 ALTER TABLE active_storage_blobs MODIFY `service_name` varchar(255) NOT NULL;
 ALTER TABLE supplier_categories MODIFY `financial_transaction_class_id` int(11) NOT NULL;
 ALTER TABLE suppliers MODIFY `supplier_category_id` int(11) NOT NULL;
+-- --------------------------------------------------------------------------------------------------
+
+-- --------------------------------------------------------------------------------------------------
+-- OPTIONAL CLEANING BE CAREFULL!!!
+-- --------------------------------------------------------------------------------------------------
+delete from users where deleted_at is not null;
+delete from memberships where user_id not in (select id from users where users.id = memberships.user_id);
+delete from groups where id not in (select group_id from memberships);
+delete from group_orders where ordergroup_id not in (select id from groups);
+
+-- ?? group_order_id =?= ordergroup_id ==> leaves only 2014 records
+-- delete from group_order_articles where group_order_id not in (select id from groups);
+-- delete from group_order_article_quantities where group_order_article_id not in (select id from articles);
+
+delete from articles where deleted_at is not null;
+delete from article_prices where article_prices.article_id not in (select id from articles where articles.id = article_prices.article_id); 
+
  */
