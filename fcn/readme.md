@@ -190,7 +190,7 @@ Dump db schema
 mariadb-dump --compact --add-drop-table --no-data --quick foodsoft_db > fs_db.sql
 ```
 
-Voor het toevoegen van de development admin aan de gemigreerde database.
+Voor het toevoegen van de development admin aan de gemigreerde database, tbv testen van de migratie.
 
 ```sql
 insert into foodsoft_adam.users (nick, password_hash, password_salt, first_name, last_name, email, created_on)
@@ -199,12 +199,12 @@ insert into foodsoft_adam.users (nick, password_hash, password_salt, first_name,
       where b.id = 1; 
 
 -- Pas aan naar behoefte - ID's gebaseerd op FCN db
-insert into memberships (user_id, group_id) values (<nieuwe user id>, 1); -- Lijstverwerkers / System admin
-insert into memberships (user_id, group_id) values (<nieuwe user id>, 533); -- Uitgiftecoördinatoren
-insert into memberships (user_id, group_id) values (<nieuwe user id>, 534); -- Bestelteam
-insert into memberships (user_id, group_id) values (<nieuwe user id>, 536); -- Bestuur
-insert into memberships (user_id, group_id) values (<nieuwe user id>, 801); -- Systeem
-insert into memberships (user_id, group_id) values (<nieuwe user id>, 820); -- Ledenadministratie
+insert into foodsoft_adam.memberships (user_id, group_id) values (<nieuwe user id>, 1); -- Lijstverwerkers / System admin
+insert into foodsoft_adam.memberships (user_id, group_id) values (<nieuwe user id>, 533); -- Uitgiftecoördinatoren
+insert into foodsoft_adam.memberships (user_id, group_id) values (<nieuwe user id>, 534); -- Bestelteam
+insert into foodsoft_adam.memberships (user_id, group_id) values (<nieuwe user id>, 536); -- Bestuur
+insert into foodsoft_adam.memberships (user_id, group_id) values (<nieuwe user id>, 801); -- Systeem
+insert into foodsoft_adam.memberships (user_id, group_id) values (<nieuwe user id>, 820); -- Ledenadministratie
 ```
 
 Check collating
