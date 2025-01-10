@@ -50,6 +50,7 @@
  * - DELIVERIES is removed. No alternative?? Relation to STOCK_EVENTS?
  * - STOCK_CHANGES has DELIVERY_ID removed. Similar function as STOCK_EVENT_ID? -> ALTER instead of DROP?? Something else?
  * - STOCK_TAKINGS is removed. Similar function as STOCK_EVENTS? -> ALTER instead of DROP?? Something else?
+ * - ID int(11) in tables seem to be converted to BIGINT - in MySQL the int(X) has been deprecated. Unclear if that is also true for MariaDB (used here)
  * RESOLUTION
  * - ARTICLE_PRICES `article_id` which are NULL and are mandatory in v49 => set to default '0'
  * - invoice -> order_id, delivery_id => retained, will me migrated by v4.9 scripts

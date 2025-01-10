@@ -13,6 +13,7 @@ Uitgaande van database behorende bij [foodcoop-adam](https://github.com/foodcoop
   - [Migratie](#migratie)
     - [Tips](#tips)
   - [Nuttige tools](#nuttige-tools)
+    - [Decrypt database](#decrypt-database)
 
 ## Ubuntu
 
@@ -227,3 +228,12 @@ AND
 
 - Visual file compare [Kompare](https://invent.kde.org/sdk/kompare)
 - Database tool [DBeaver-CE](https:\\www.dbeaver.io)
+- Encryptie [GPG](https://gpgtools.org/)
+
+### Decrypt database
+
+Aangenomen dat het bronbestand met je public GPG key is versleuteld.
+
+```bash
+gpg --decrypt [filename] --output foodsoft_db.sql.gz
+```
