@@ -67,7 +67,11 @@
 SET character_set_server = 'utf8mb4';
 SET collation_server = 'utf8mb4_general_ci';
 
-SELECT * FROM information_schema.SCHEMATA;
+-- SELECT * FROM information_schema.SCHEMATA;
+-- ALTER DATABASE mysql
+--	CHARACTER SET utf8mb4
+--	COLLATE = utf8mb4_general_ci;
+
 
 -- Explicit to force error when on the wrong connection
 USE foodsoft_adam;
