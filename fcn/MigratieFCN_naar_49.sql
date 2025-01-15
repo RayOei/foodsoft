@@ -324,7 +324,7 @@ ALTER table foodsoft_adam.suppliers
 	COLLATE = utf8mb4_general_ci;
 
 ALTER table foodsoft_adam.suppliers
-	MODIFY COLUMN supplier_category_id int(11) DEFAULT NULL,
+	-- MODIFY COLUMN supplier_category_id int(11) DEFAULT NULL,
 	DROP COLUMN IF EXISTS article_info_url,
 	DROP COLUMN IF EXISTS scope,
 	DROP COLUMN IF EXISTS use_tolerance,
@@ -458,20 +458,5 @@ ALTER TABLE active_storage_blobs MODIFY `service_name` varchar(255) NOT NULL;
 ALTER TABLE supplier_categories MODIFY `financial_transaction_class_id` int(11) NOT NULL;
 ALTER TABLE suppliers MODIFY `supplier_category_id` int(11) NOT NULL;
 -- --------------------------------------------------------------------------------------------------
-
--- --------------------------------------------------------------------------------------------------
--- OPTIONAL CLEANING BE CAREFULL!!!
--- --------------------------------------------------------------------------------------------------
-delete from users where deleted_at is not null;
-delete from memberships where user_id not in (select id from users where users.id = memberships.user_id);
-delete from groups where id not in (select group_id from memberships);
-delete from group_orders where ordergroup_id not in (select id from groups);
-
--- ?? group_order_id =?= ordergroup_id ==> leaves only 2014 records
--- delete from group_order_articles where group_order_id not in (select id from groups);
--- delete from group_order_article_quantities where group_order_article_id not in (select id from articles);
-
-delete from articles where deleted_at is not null;
-delete from article_prices where article_prices.article_id not in (select id from articles where articles.id = article_prices.article_id); 
 
  */
