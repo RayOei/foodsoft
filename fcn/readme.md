@@ -1,6 +1,6 @@
 # FoodCoopNoord
 
-Notities voor FCN (FoodCoopNoord) installatie van FS ten bate van DB migratie naar upstream versie.
+Notities voor FCN (FoodCoopNoord) installatie van FS ten bate van DB migratie naar upstream versie 4.9.
 
 Uitgaande van database behorende bij [foodcoop-adam](https://github.com/foodcoop-adam/foodsoft) `v3.4.0+adam+B`
 
@@ -11,17 +11,23 @@ Uitgaande van database behorende bij [foodcoop-adam](https://github.com/foodcoop
     - [FS development](#fs-development)
     - [Run FS](#run-fs)
   - [Migratie](#migratie)
-    - [Tips](#tips)
-  - [Nuttige tools](#nuttige-tools)
+  - [Tips](#tips)
+    - [Nuttige tools](#nuttige-tools)
+    - [Dump](#dump)
+    - [Admin](#admin)
+    - [Collating](#collating)
     - [Decrypt database](#decrypt-database)
+  - [Ontwikkelomgeving](#ontwikkelomgeving)
+    - [TODO](#todo)
+    - [Tests](#tests)
 
 ## Ubuntu
 
-Ubuntu 24.04 LTS
+Ubuntu 24.04 LTS met laatste updates geïnstalleerd.
 
 ## MariaDB
 
-Installeer. Ten tijde van schrijven `v10.11.8-MariaDB-0ubuntu.24.04.1`
+Installeer. Ten tijde van schrijven `v10.11.8-MariaDB-0ubuntu.24.04.1`.
 
 ```bash
 sudo apt update
@@ -61,9 +67,12 @@ mariadb
 
 ### FS development
 
-Volg [instructies](../doc/SETUP_DEVELOPMENT.md)
+Let op! De basis is Ruby v2.3. Zie [upgrade issue](https://github.com/foodcoops/foodsoft/issues/1002) voor stand van zaken voor versie 3+.
+Vele gems zijn ook (zeer) oud, dit kan hier en daar problemen geven bij het opzetten van de omgeving.
 
-> Pas de stap met `rbenv exec gem install bundler` de versie `rbenv exec gem install bundler -v 2.4.22`. Dit omdat Ruby EOL is en Bundler een nieuwere versie verwacht.
+Volg [instructies](../doc/SETUP_DEVELOPMENT.md) van FS voor het opzetten van de ontwikkelomgeving.
+
+Pas bij de stap met `rbenv exec gem install bundler` de gewenste (oude) versie toe `rbenv exec gem install bundler -v 2.4.22`. Dit omdat Ruby 2 EOL is en de huidige Bundler de nieuwere versie 3 verwacht.
 
 !!! LET OP !!!
 
@@ -79,51 +88,54 @@ Dit script verwacht `feitelijk` dat je configuraties aanpast `terwijl` je in het
 4. Kind database
    1. MySQL
 5. Finished?
-   1. EERST deze stappen:
+   1. `EERST` deze stappen:
+   2. Start een `TWEEDE` terminal
+   3. Maak een kopie van `config/database.yml.MySQL_SAMPLE` en noem die `config\database.yml`
 
-Maak een kopie van `config/database.yml.MySQL_SAMPLE` en noem die `config\database.yml`
+   Er zijn verschillende manieren om dit (meer of minder veilig) te configureren. Voor het gemak van ontwikkelen (en niet steeds bestanden te hoeven aanpassen) is gekozen voor een environment variable als definitie voor de DB gegevens.
 
-Er zijn verschillende manieren om dit (meer of minder veilig) te configureren.
-Voor het gemak van ontwikkelen (en niet steeds bestanden te hoeven aanpassen) is gekozen voor een environment variable als definitie voor de DB gegevens.
+   > Dit is _DUS_ niet een veilige productie oplossing ;-)
 
-> Dit is _DUS_ niet een veilige productie oplossing ;-)
+   Pas de sectie [development] aan
 
-Pas de sectie [development] aan
+   ```yml
+   database: foodsoft_development
+   username: <% ENV['FOODSOFT_DB_USER] %>
+   username: <% ENV['FOODSOFT_DB_PASSWORD] %>
+   ```
 
-```yml
-database: FOODSOFT_DB
-username: <% ENV['FOODSOFT_DB_USER] %>
-username: <% ENV['FOODSOFT_DB_PASSWORD] %>
-```
+   Definieer in het environment (`.bashrc` or `.zshrc` bv) en exporteer:
 
-Definieer in het environment (.bashrc or .zshrc bv) en exporteer:
+   ```bash
+   export FOODSOFT_DB_USER=fooduser
+   export FOODSOFT_DB_PASSWORD=foodpassword
+   ```
 
-```bash
-export FOODSOFT_DB_USER=<whatever_user>
-export FOODSOFT_DB_PASSWORD=<whatever_password>
-```
+   Open MariaDB
 
-```bash
-mariadb
-```
+   ```bash
+   mariadb
+   ```
 
-Maak Foodsoft gebruiker aan EN maak een database aan (zoals gedefinieerd in `config/database.yml`).
-Het lijkt erop dat het script deze database verwacht en niet aanmaakt als deze niet bestaat. Wat wel gebeurt voor `test` omgeving. Lijkt een bug.
+   Maak Foodsoft gebruiker aan EN maak een database aan zoals gedefinieerd in `config/database.yml`, i.e. `foodsoft_development`.
+   Het lijkt erop dat het script deze database verwacht en niet aanmaakt als deze niet bestaat. Wat wel gebeurt voor de `test` omgeving. Lijkt een bug.
 
-```sql
-CREATE DATABASE foodsoft_development
-CREATE USER 'fooduser'@'localhost' IDENTIFIED BY 'foodpassword';
-GRANT ALL PRIVILEGES ON FOODSOFT_DB.* to 'fooduser'@'localhost';
-```
+   ```sql
+   CREATE DATABASE foodsoft_development
+   CREATE USER 'fooduser'@'localhost' IDENTIFIED BY 'foodpassword';
+   GRANT ALL PRIVILEGES ON foodsoft_development.* to 'fooduser'@'localhost';
+   ```
 
-We houden alles verder standaard voor nu.
+   We houden alles verder standaard voor nu.
 
-> Ga nu verder met de `rbenv exec rails foodsoft:setup_development` stap en bevestig `Y`.
+   > Ga nu terug naar de 1ste terminal met de wachtende `rbenv exec rails foodsoft:setup_development` - `FINISHED?` stap en bevestig `Y`.
 
 6. config/storage
    1. Force rewrite
 7. Mailcatcher
    1. `N`
+
+Let op: `mailcatcher` heeft een specifieke versie van `thin` nodig die niet installeert via `bundler`. Zie [verder](#ontwikkelomgeving)
 
 Het script zou nu zonder problemen een database moeten opbouwen. Als dat niet het geval is: controleer de environment variabelen.
 > Er worden diverse waarschuwingen gegenereerd. Waarschijnlijk omdat de scripts niet meer volledig compatible zijn met de huidige MariaDB versie
@@ -142,7 +154,8 @@ Een `show tables` zou nu een gevulde `foodsoft_development` moeten tonen.
 
 ### Run FS
 
-Start `foodsoft`
+Start `foodsoft`.
+Let op dat de eerder aangemaakte environment variabelen bekend zijn (start nieuwe terminal of `source environment`).
 
 ```bash
 bundle exec rails s
@@ -156,40 +169,76 @@ Voor externe toegang:
 bundle exec rails s --binding=0.0.0.0
 ```
 
-Open FS van (http://<ipadres>:3000) van een andere machine in je netwerk.
+Open FS van (http://[ipadres]:3000) lokaal of van een andere machine in je netwerk (in het geval van externe toegang).
+Je moet nu een werkende, verder lege, FS hebben waarop in te loggen is met de standaard `admin@foo.test/secret` combinatie.
 
 ## Migratie
 
-Restore een database van de FoodCoopAdam installie, hier `foodsoft_adam` genoemd.
+Maak een nieuwe database, hier `foodsoft_adam` genoemd, in MariaDB.
+Restore een backup van de FoodCoopAdam installatie naar deze database.
 
-Run het FCN migratie script dat de database aanpast voordat de Foodsoft migratie plaatsvindt. Dit zorgt ervoor dat de database in een staat is waarbij de FS migratie niet faalt, terwijl zoveel mogelijk data behouden blijft.
+```bash
+mariadb foodsoft_adam < foodsoft_db.sql
+```
 
-Zie de aanwijzingen in het [script](./MigratieFCN_naar_49.sql)
+Zet permissies voor de gebruiker om deze database te benaderen.
 
-Run de FS migratie.
+> Er zijn nu twee databases: een referentie `foodsoft_development` en `foodsoft_adam`.
+
+- Run het FCN migratie script dat de database aanpast _voordat_ de Foodsoft migratie plaatsvindt. Dit zorgt ervoor dat de database in een staat is waarbij de FS migratie niet faalt, terwijl zoveel mogelijk data behouden blijft.
+
+Zie de aanwijzingen in het [script](./MigratieFCN_naar_49.sql).
+
+> Let op dat FS niet actief is, stop zonodig een eerder gestarte `exec rails s` instantie.
+
+- Pas `config.database.yml` aan
+
+```yml
+database: foodsoft_adam
+```
+
+- Run de FS migratie.
 
 ```bash
 # env definitie uit database.yml: development of test
-bin/rails db:migrate RAILS_ENV=<env> 
+bin/rails db:migrate RAILS_ENV=development
 ```
 
 Controleer resultaat.
 
-Start FS en controleer de werking, [zie](#run-fs)
+Start FS en controleer de werking, zie [hier](#run-fs)
 
 Als alles naar verwachting is verlopen zou er een [werkende FS v4.9](http://localhost:3000) moeten zijn met de gemigreerde data.
+Inloggen met bekende gebruikers is nu mogelijk.
 
-Dit is nog steeds op `development`! Dat betekent dat externe diensten, zoals emaill en Mollie, niet beschikbaar zijn. 
-
+Dit is nog steeds op `development`! Dat betekent dat externe diensten, zoals emaill en Mollie, niet beschikbaar zijn.
 Dat moet nog verder geconfigureerd worden.
 
-### Tips
+## Tips
 
-Dump db schema
+### Nuttige tools
+
+- Visual file compare [Kompare](https://invent.kde.org/sdk/kompare)
+- Database tool [DBeaver-CE](https:\\www.dbeaver.io)
+- Encryptie [GPG](https://gpgtools.org/)
+
+### Dump
+
+Dump db referentie scheme
 
 ```bash
-mariadb-dump --compact --add-drop-table --no-data --quick foodsoft_db > fs_db.sql
+mariadb-dump --compact --add-drop-table --no-data --quick foodsoft_development > fs_db.sql
 ```
+
+Dump FS Adam scheme
+
+```bash
+mariadb-dump --compact --add-drop-table --no-data --quick foodsoft_adam > fs_adam.sql
+```
+
+Gebruik een file compare programma om verschillen te vinden.
+
+### Admin
 
 Voor het toevoegen van de development admin aan de gemigreerde database, tbv testen van de migratie.
 
@@ -208,7 +257,9 @@ insert into foodsoft_adam.memberships (user_id, group_id) values (<nieuwe user i
 insert into foodsoft_adam.memberships (user_id, group_id) values (<nieuwe user id>, 820); -- Ledenadministratie
 ```
 
-Check collating
+### Collating
+
+Controlleer collating op afwijkende instellingen.
 
 ```sql
 SELECT *
@@ -224,16 +275,42 @@ AND
 );
 ```
 
-## Nuttige tools
-
-- Visual file compare [Kompare](https://invent.kde.org/sdk/kompare)
-- Database tool [DBeaver-CE](https:\\www.dbeaver.io)
-- Encryptie [GPG](https://gpgtools.org/)
-
 ### Decrypt database
 
 Aangenomen dat het bronbestand met je public GPG key is versleuteld.
 
 ```bash
-gpg --decrypt [filename] --output foodsoft_db.sql.gz
+gpg --output foodsoft_db.sql.gz --decrypt [filename]
+# Unpack the zip
+gzip -d foodsoft_db.sql.gz
+```
+
+## Ontwikkelomgeving
+
+In principe zorgt bovenstaande voor een werkende `v4.9.0`. Niet alle opties zullen echter werken.
+Voor een `complete` ontwikkelomgeving is het nodig om alle gems te installeren.
+Vanwege het feit dat nogal wat gems vrij oud zijn kan dit problemen geven.
+
+Installeer de gewenste `thin` gem handmatig (via bundle faalt dit) en `mailcatcher` installeert dan ook niet.
+
+```bash
+gem install thin -v '1.6.2' -- --with-cflags="-Wno-error=implicit-function-declaration"
+```
+
+Voer de bundle install uit.
+
+```bash
+bundle install
+```
+
+### TODO
+
+Voorzover bekend kunnen zowel [mailcatcher](https://rubygems.org/gems/mailcatcher) als [thin](https://rubygems.org/gems/thin) naar nieuwere versies getild worden. Waarbij de dependency met de EOL [skinny](https://rubygems.org/gems/skinny) verdwijnt.
+Vermoedelijk wordt dit meegenomen met de geplande, en zeer noodzakelijk, upgrade naar Ruby 3x.
+
+### Tests
+
+```bash
+bundle exec rake db:schema:load
+bundle exec rake rspec-rerun:spec
 ```

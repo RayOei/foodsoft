@@ -326,6 +326,7 @@ ALTER table foodsoft_adam.suppliers
 	COLLATE = utf8mb4_general_ci;
 
 ALTER table foodsoft_adam.suppliers
+	-- MODIFY COLUMN supplier_category_id int(11) DEFAULT NULL,
 	DROP COLUMN IF EXISTS article_info_url,
 	DROP COLUMN IF EXISTS scope,
 	DROP COLUMN IF EXISTS use_tolerance,
