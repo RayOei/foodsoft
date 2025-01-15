@@ -1,6 +1,8 @@
  
 CREATE DATABASE foodsoft_adam;
 
+-- CREATE test admin user
+
 insert into foodsoft_adam.users (nick, password_hash, password_salt, first_name, last_name, email, created_on)
    select "fcn_admin", password_hash, password_salt, first_name, last_name, email, NOW() 
       from foodsoft_development.users b 
