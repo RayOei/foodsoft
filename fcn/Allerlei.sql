@@ -22,8 +22,10 @@ insert into foodsoft_adam.memberships (user_id, group_id) values (893, 820); -- 
 select * from users where deleted_at is not null;
 select g.*, m.* from groups g join memberships m on m.group_id = g.id;
 select g.* from groups g where id not in (select group_id from memberships);
-
-select * from groups where deleted_at is null and type = 'Workgroup';
+-- Special groups
+select * from groups where deleted_at is not null and type = 'Workgroup';
+-- Households
+select * from groups where deleted_at is not null and type = 'Ordergroup' order by name;
 
 -- select * from foodsoft_fcn.groups where deleted_at is null and approved=0; >> approved doesn't seem to have a function for FCN
 
