@@ -39,9 +39,6 @@ ORDER by table_name;
 -- Final set used (do check!!)
 USE foodsoft_adam;
 
-ALTER table foodsoft_adam.suppliers
-	MODIFY COLUMN supplier_category_id int(11) DEFAULT NULL;
-
 ALTER table foodsoft_adam.stock_events 
 	CHARACTER SET utf8mb4,
 	COLLATE = utf8mb4_general_ci;
@@ -107,10 +104,13 @@ ALTER TABLE foodsoft_adam.`users` MODIFY `reset_password_token` varchar(255) CHA
 
 
 -- --------------------------------------------------------------------------------------------------
--- !! CORRECTIONS AS some migration changes are not applied
+-- !! CORRECTIONS as some migration changes are not applied?
 
-ALTER TABLE foodsoft_adam.active_storage_blobs MODIFY `service_name` varchar(255) NOT NULL;
-ALTER TABLE foodsoft_adam.supplier_categories MODIFY `financial_transaction_class_id` int(11) NOT NULL;
-ALTER TABLE foodsoft_adam.suppliers MODIFY `supplier_category_id` int(11) NOT NULL;
+ALTER TABLE foodsoft_adam.active_storage_blobs 
+	MODIFY `service_name` varchar(255) NOT NULL;
+ALTER TABLE foodsoft_adam.supplier_categories 
+	MODIFY `financial_transaction_class_id` int(11) DEFAULT NULL;
+ALTER TABLE foodsoft_adam.suppliers 
+	MODIFY `supplier_category_id` int(11) DEFAULT NULL;
 -- --------------------------------------------------------------------------------------------------
 
