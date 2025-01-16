@@ -112,5 +112,7 @@ ALTER TABLE foodsoft_adam.supplier_categories
 	MODIFY `financial_transaction_class_id` int(11) DEFAULT NULL;
 ALTER TABLE foodsoft_adam.suppliers 
 	MODIFY `supplier_category_id` int(11) DEFAULT NULL;
+
+-- NOTE mariadb-dump seems to have an issue where a constraint is defined while the required table is not yet created.
 -- --------------------------------------------------------------------------------------------------
 

@@ -10,7 +10,13 @@ Uitgaande van database behorende bij [foodcoop-adam](https://github.com/foodcoop
     - [Gebruikers](#gebruikers)
     - [FS development](#fs-development)
     - [Run FS](#run-fs)
-  - [Migratie](#migratie)
+  - [Upgrade DB](#upgrade-db)
+    - [Restore](#restore)
+      - [Pointers](#pointers)
+    - [Preperation](#preperation)
+    - [Migration](#migration)
+    - [Post conversion](#post-conversion)
+    - [Run](#run)
   - [Tips](#tips)
     - [Nuttige tools](#nuttige-tools)
     - [Dump](#dump)
@@ -172,14 +178,26 @@ bundle exec rails s --binding=0.0.0.0
 Open FS van (http://[ipadres]:3000) lokaal of van een andere machine in je netwerk (in het geval van externe toegang).
 Je moet nu een werkende, verder lege, FS hebben waarop in te loggen is met de standaard `admin@foo.test/secret` combinatie.
 
-## Migratie
+## Upgrade DB
 
 Maak een nieuwe database, hier `foodsoft_adam` genoemd, in MariaDB.
+
+### Restore
+
 Restore een backup van de FoodCoopAdam installatie naar deze database.
 
 ```bash
 mariadb foodsoft_adam < foodsoft_db.sql
 ```
+
+#### Pointers
+
+- Mariadb-dump seems to define constraints before the related table exists, this fails the restore.
+  - Either swap the order in the dump file or 
+  - create the table manually
+- Older MariaDB and MySQL clients have problems with the `mariadb-dump` from the latest versions, see [here](https://mariadb.com/kb/en/mariadb-dump/)
+
+### Preperation
 
 Zet permissies voor de gebruiker om deze database te benaderen.
 
@@ -197,6 +215,8 @@ Zie de aanwijzingen in het [script](./MigratieFCN_naar_49.sql).
 database: foodsoft_adam
 ```
 
+### Migration
+
 - Run de FS migratie.
 
 ```bash
@@ -204,7 +224,15 @@ database: foodsoft_adam
 bin/rails db:migrate RAILS_ENV=development
 ```
 
-Controleer resultaat.
+### Post conversion
+
+Some additional steps are needed to get the database, _after_ the FS migration,into the right state.
+
+Zie de aanwijzingen in het [script](./MigratieFCN_naar_49_post.sql).
+
+Controleer final resultaat: a dump file compare is the easiest for the schema.
+
+### Run
 
 Start FS en controleer de werking, zie [hier](#run-fs)
 
