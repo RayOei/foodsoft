@@ -356,5 +356,14 @@ ALTER table foodsoft_adam.users
 	CHARACTER SET utf8mb4,
 	COLLATE = utf8mb4_general_ci;
 
+-- IMPORTANT CORRECTION OF THE DATA
+-- 20181201000305_ensure_article_for_article_price.rb corrects older data for having a NULL as article_id but doesn't correct for `0` (zero) as value
+-- this breaks upstream migrations.
+UPDATE article_prices ap 
+	INNER JOIN order_articles oa ON ap.id = oa.article_price_id 
+	SET ap.article_id = oa.article.id 
+	WHERE ap.article_id = 0; 
+
+
 COMMIT;
 
