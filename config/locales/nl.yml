@@ -2,7 +2,7 @@ nl:
   activerecord:
     attributes:
       article:
-        added_new_property: this is new
+        added_new_property: Dit is nieuw
         article_category: Categorie
         availability: Artikel leverbaar?
         availability_short: leverb.
