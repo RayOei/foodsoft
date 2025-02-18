@@ -2,6 +2,7 @@ en:
   activerecord:
     attributes:
       article:
+        added_new_property: this is new
         article_category: Category
         availability: Is article available?
         availability_short: avail.
