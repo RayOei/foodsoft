@@ -2,6 +2,7 @@ de:
   activerecord:
     attributes:
       article:
+        added_new_property: this is new
         article_category: Kategorie
         availability: Artikel ist verfügbar?
         availability_short: verf.
@@ -760,13 +761,13 @@ de:
     order_fax:
       filename: Bestellung %{name}-%{date} - Fax
       rows:
-        - BestellNr.
-        - Menge
-        - Name
-        - Gebinde
-        - Einheit
-        - Preis/Einheit
-        - Summe
+      - BestellNr.
+      - Menge
+      - Name
+      - Gebinde
+      - Einheit
+      - Preis/Einheit
+      - Summe
       total: Gesamtpreis
     order_matrix:
       filename: Bestellung %{name}-%{date} - Sortiermatrix
