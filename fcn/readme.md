@@ -1,6 +1,8 @@
 # FoodCoopNoord
 
-Notities voor FCN (FoodCoopNoord) installatie van FS ten bate van DB migratie naar upstream versie 4.9.
+Notities voor FCN (FoodCoopNoord) installatie van FS ten bate van DB migratie naar upstream versie 4.9.1, gehost door [Roko.li](https://roko.li)
+
+> Let op! Foodsoft upstream geeft v4.9 als `latest-release` ten tijde van schrijven. De versie die `Roko.li` gebruikt is echter `4.9.1`
 
 Uitgaande van database behorende bij [foodcoop-adam](https://github.com/foodcoop-adam/foodsoft) `v3.4.0+adam+B`
 
@@ -12,20 +14,22 @@ Uitgaande van database behorende bij [foodcoop-adam](https://github.com/foodcoop
     - [Run FS](#run-fs)
   - [Upgrade DB](#upgrade-db)
     - [Restore](#restore)
-      - [Pointers](#pointers)
-    - [Preperation](#preperation)
-    - [Migration](#migration)
-    - [Post conversion](#post-conversion)
-    - [Run](#run)
+    - [Voorbereiding](#voorbereiding)
+    - [Migratie](#migratie)
+    - [Na de migratie](#na-de-migratie)
+    - [Start FS](#start-fs)
+    - [Dump voor hosting](#dump-voor-hosting)
+      - [Gotcha's](#gotchas)
   - [Tips](#tips)
     - [Nuttige tools](#nuttige-tools)
-    - [Dump](#dump)
+    - [Dump voor controle](#dump-voor-controle)
     - [Admin](#admin)
     - [Collating](#collating)
     - [Decrypt database](#decrypt-database)
-  - [Ontwikkelomgeving](#ontwikkelomgeving)
-    - [TODO](#todo)
-    - [Tests](#tests)
+    - [Encrypt database](#encrypt-database)
+    - [Ontwikkelomgeving](#ontwikkelomgeving)
+      - [Tests](#tests)
+      - [TODO](#todo)
 
 ## Ubuntu
 
@@ -190,32 +194,25 @@ Restore een backup van de FoodCoopAdam installatie naar deze database.
 mariadb foodsoft_adam < foodsoft_db.sql
 ```
 
-#### Pointers
-
-- Mariadb-dump seems to define constraints before the related table exists, this fails the restore.
-  - Either swap the order in the dump file or 
-  - create the table manually
-- Older MariaDB and MySQL clients have problems with the `mariadb-dump` from the latest versions, see [here](https://mariadb.com/kb/en/mariadb-dump/)
-
-### Preperation
+### Voorbereiding
 
 Zet permissies voor de gebruiker om deze database te benaderen.
 
 > Er zijn nu twee databases: een referentie `foodsoft_development` en `foodsoft_adam`.
 
-- Run het FCN migratie script dat de database aanpast _voordat_ de Foodsoft migratie plaatsvindt. Dit zorgt ervoor dat de database in een staat is waarbij de FS migratie niet faalt, terwijl zoveel mogelijk data behouden blijft.
+- Run het `FCN migratie script` dat de database aanpast _voordat_ de Foodsoft migratie plaatsvindt. Dit zorgt ervoor dat de database in een staat is waarbij de FS migratie niet faalt, terwijl zoveel mogelijk data behouden blijft.
 
 Zie de aanwijzingen in het [script](./MigratieFCN_naar_49.sql).
 
+### Migratie
+
 > Let op dat FS niet actief is, stop zonodig een eerder gestarte `exec rails s` instantie.
 
-- Pas `config.database.yml` aan
+- Pas `config.database.yml` aan, dit is de database die voorbereid is met het `migratieFCN_naar_49.sql` script.
 
 ```yml
 database: foodsoft_adam
 ```
-
-### Migration
 
 - Run de FS migratie.
 
@@ -224,23 +221,44 @@ database: foodsoft_adam
 bin/rails db:migrate RAILS_ENV=development
 ```
 
-### Post conversion
+Dit zou zonder fouten moeten verlopen. Indien er fouten optreden, controlleer het migratiescript en pas aan waar nodig.
+Begin **opnieuw** bij [](#restore) met een schone database.
 
-Some additional steps are needed to get the database, _after_ the FS migration,into the right state.
+### Na de migratie
 
-Zie de aanwijzingen in het [script](./MigratieFCN_naar_49_post.sql).
+Enkele extra stappen zijn nodig, _na de FS migratie_, om de database in de juiste staat te krijgen.
 
-Controleer final resultaat: a dump file compare is the easiest for the schema.
+Zie de aanwijzingen in het [post-script](./MigratieFCN_naar_49_post.sql).
 
-### Run
+Controleer eindresultaat: een file compare van de dump, zonder data, met een schone v4.9.1 database, is het gemakkelijkst. [Zie](#dump).
+
+### Start FS
 
 Start FS en controleer de werking, zie [hier](#run-fs)
 
-Als alles naar verwachting is verlopen zou er een [werkende FS v4.9](http://localhost:3000) moeten zijn met de gemigreerde data.
+Als alles naar verwachting is verlopen zou er een [werkende FS v4.9.1](http://localhost:3000) moeten zijn met de gemigreerde data.
 Inloggen met bekende gebruikers is nu mogelijk.
 
 Dit is nog steeds op `development`! Dat betekent dat externe diensten, zoals emaill en Mollie, niet beschikbaar zijn.
 Dat moet nog verder geconfigureerd worden.
+
+### Dump voor hosting
+
+Exporteer de database:
+
+```bash
+mariadb-dump --compact --add-drop-table --quick foodsoft_adam > fs_adam_export.sql
+```
+
+#### Gotcha's
+
+- Mariadb-dump blijkt de volgorde van de commando's niet altijd correct aan te maken, bv constraints voor nog niet aanwezige tabellen, hierdoor faalt de restore van de gemigreerde data.
+  - Dit treft met name de volgende tabellen en moet aangepast worden in het dump file (aangegeven de gewenste volgorde):
+    1. `active_storage_blobs`;
+    2. `active_storage_attachments`;
+    3. `active_storage_variant_records`;
+
+- Oudere MariaDB and MySQL clients hebben problemen met `mariadb-dump` van de recentere versies, zie [hier](https://mariadb.com/kb/en/mariadb-dump/), dit kan leiden tot een error bij een restore.
 
 ## Tips
 
@@ -250,7 +268,7 @@ Dat moet nog verder geconfigureerd worden.
 - Database tool [DBeaver-CE](https:\\www.dbeaver.io)
 - Encryptie [GPG](https://gpgtools.org/)
 
-### Dump
+### Dump voor controle
 
 Dump db referentie scheme
 
@@ -306,6 +324,7 @@ AND
 ### Decrypt database
 
 Aangenomen dat het bronbestand met je public GPG key is versleuteld.
+En het bronbestand ook nog `geziped` is (dit is feitelijk overbodig met encryptie en potentieel een risico).
 
 ```bash
 gpg --output foodsoft_db.sql.gz --decrypt [filename]
@@ -313,9 +332,20 @@ gpg --output foodsoft_db.sql.gz --decrypt [filename]
 gzip -d foodsoft_db.sql.gz
 ```
 
-## Ontwikkelomgeving
+### Encrypt database
 
-In principe zorgt bovenstaande voor een werkende `v4.9.0`. Niet alle opties zullen echter werken.
+Voor verzending naar Roko.li is hier de [GPG sleutel](https://roko.li/rokoli.asc) op te halen.
+
+```bash
+gpg --encrypt --sign --armor -r hallo@roko.li fs_adam_export.sql
+```
+
+Onbekend met GPG? Zie hier voor [snelle intro](https://www.digitalocean.com/community/tutorials/how-to-use-gpg-to-encrypt-and-sign-messages). 
+En voor meer GPG [info](https://gnupg.org/).
+
+### Ontwikkelomgeving
+
+In principe zorgt bovenstaande voor een werkende `v4.9.1`. Niet alle opties zullen echter werken.
 Voor een `complete` ontwikkelomgeving is het nodig om alle gems te installeren.
 Vanwege het feit dat nogal wat gems vrij oud zijn kan dit problemen geven.
 
@@ -331,14 +361,13 @@ Voer de bundle install uit.
 bundle install
 ```
 
-### TODO
-
-Voorzover bekend kunnen zowel [mailcatcher](https://rubygems.org/gems/mailcatcher) als [thin](https://rubygems.org/gems/thin) naar nieuwere versies getild worden. Waarbij de dependency met de EOL [skinny](https://rubygems.org/gems/skinny) verdwijnt.
-Vermoedelijk wordt dit meegenomen met de geplande, en zeer noodzakelijk, upgrade naar Ruby 3x.
-
-### Tests
+#### Tests
 
 ```bash
 bundle exec rake db:schema:load
 bundle exec rake rspec-rerun:spec
 ```
+#### TODO
+
+Voorzover bekend kunnen zowel [mailcatcher](https://rubygems.org/gems/mailcatcher) als [thin](https://rubygems.org/gems/thin) naar nieuwere versies getild worden. Waarbij de dependency met de EOL [skinny](https://rubygems.org/gems/skinny) verdwijnt.
+Vermoedelijk wordt dit meegenomen met de geplande, en zeer noodzakelijk, upgrade naar Ruby 3x.
