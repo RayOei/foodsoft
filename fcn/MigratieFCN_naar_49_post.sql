@@ -1,10 +1,10 @@
 
 /*
- * -----------------------------------------------------------------------------------------------------
+ * --------------------------------------------------------------------------------------------------------
  * !! AFTER RUNNING RAKE MIGRATION -- 
- * ------------------------------------------------------------------------------------------------------
- * Corrections AFTER the running of rake:migrate, this should align the migrated database in full to v4.9
- * ------------------------------------------------------------------------------------------------------- 
+ * --------------------------------------------------------------------------------------------------------
+ * Corrections AFTER the running of rake:migrate, this should align the migrated database in full to v4.9.1
+ * --------------------------------------------------------------------------------------------------------
  *  
  * 
  * TODO automate further
@@ -20,7 +20,7 @@
  * 
  *  HELPER to generate modify for collating. 
  * 
- * !!! Check text type as those are modified with an unwanted type/size. 
+ * !!! Check text type as those may be modified with an unwanted type/size. 
  * !!! Eg. text types from FCN may be modified to mediumtext type!
  * 
 

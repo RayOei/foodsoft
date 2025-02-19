@@ -10,42 +10,45 @@
  * This scripts removes and alters all tables/columns to fit the upstream state _before_ its migration scripts run
  * This will prevent ActiveRecord from updating schema.rb with the FCA fork changes.
  * 
- * =>>>>
- * =>>>> 
- * =>>>> !!! BE AWARE of the final generated SQL of this script which needs to be executed too !!!
- * =>>>> 
- * =>>>>
- * 
  * After running this script execute the `bin/rails db:migrate RAILS_ENV=<env> command to run the migration scripts
  *
- * SUMMARY APPROACH
+ * =>>>>
+ * =>>>> 
+ * =>>>> !!! BE AWARE of the post migration script which needs to be executed too !!!
+ * =>>>> 
+ * =>>>>
+ *
+ * ----------------
+ * APPROACH SUMMARY
  * ----------------
  *
- * - Run _this_ script (which initially is empty) ;-)
+ * - Run _this_ script
  * - Run rake migration 
  * -- Errors ?: Add actions to fix issues in _this_ script 
  * -- Success ?: 
- * 		-- compare schemas from clean development db and resulting db
- * 			-- Differences ?: add actions to _this_ script
- * 		-- compare schemas from clean development and resulting db
- * 			-- Differences ?: add actions to _this_ script
- * - !! REVERT changed db/schema/db !! and make sure the version is as v4.9 requires !!
- * - Rinse - restore original foodsoft_adam db
- * - ------------------------------------------------------------------------------------------
- * - REPEAT until no meaningfull differences are found (like columns in different order)
+ *  -- RUN Migration POST script to finalize - this contains specific changes which could not be added to this script
+ * 	-- compare schemas from clean development db and resulting db
+ * 		-- Differences ?: add actions to _this_ script (or the post script, depending on type of difference)
+ * - !! REVERT changed db/schema/db !! and make sure the version is as v4.9.1 requires !!
+ *      -- modify this script so db/schema.db is no longer altered after running the rake migration
+ * - --------------------------------------------------------------------------------------------
+ * - RINSE - restore original foodsoft_adam db
+ * - --------------------------------------------------------------------------------------------
+ * - REPEAT until no meaningfull differences are found (like columns in different order are fine)
+ * - --------------------------------------------------------------------------------------------
  * - Start application and check if all runs as expected
- * --------------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------------------------------------
  * 
  * !!!!!! CHECK and DOUBLE CHECK
  * 
- * When done: compare the newly created schema with a clean v4.9 to be sure they align. Correct when needed and rerun the script on a fork DB
+ * When done: compare the newly created schema with a clean v4.9.1 to be sure they align. Correct when needed and rerun the scripts on a fork DB
  * 
  * Some tricks, run `mariadb-dump --compact --add-drop-table --no-data --quick foodsoft_db > fs_db.sql` for both this newly migrated DB and the clean v49 one.
  * Use a file compare to check the difference. 
  * The only differences which can be safely ignored are the `ENGINE=InnoDB AUTO_INCREMENT=<42>` ones as they are expected.   
  * 
  * 
- * TODO
+ * TODO/QUESTIONS
  * - CHECK all dropped columns. Is it safe or are alternatives needed?
  * 	-- articles -> fc_note, info_url
  *  -- financial_transactions -> payment-* columns
@@ -55,14 +58,15 @@
  * - STOCK_TAKINGS is removed. Similar function as STOCK_EVENTS? -> ALTER instead of DROP?? Something else?
  * - ID int(11) in tables seem to be converted to BIGINT - in MySQL the int(X) has been deprecated. Unclear if that is also true for MariaDB (used here)
  * RESOLUTION
- * - ARTICLE_PRICES `article_id` which are NULL and are mandatory in v49 => set to default '0'
- * - invoice -> order_id, delivery_id => retained, will me migrated by v4.9 scripts
+ * - ARTICLE_PRICES `article_id` which are NULL and are mandatory in v491 => correction is added here
+ * - invoice -> order_id, delivery_id => retained, will me migrated by v4.9.1 scripts
  *   
  * 
- * ????? active_storage_attachments different from clean install. How??
- * ????? FK defs after migration but not in clean install. How?
- * ?????? BUG in schema for STOCK_EVENTS collating on swedish. Correct for table AND type column
- * */
+ * ????? active_storage_attachments different from clean install. How?? => possibly incorrect schema.db, should be solved. Double check, though
+ * ????? FK defs after migration but not in clean install. How? => possibly incorrect schema.db, should be solved. Double check, though
+ * BUG in schema for STOCK_EVENTS collating on swedish. Correct for table AND type column in POST script
+ * 
+ */
 
 -- MariaDB > v11.6.0 has this by default 
 
