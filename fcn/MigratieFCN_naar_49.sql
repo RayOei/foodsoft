@@ -5,7 +5,7 @@
  * Migration script for the FoodcoopAmsterdam fork back to the upstream [Foodsoft](https://github.com/foodcoops/foodsoft) version 4.9.1
  * 
  * !!! Although currently FoodSoft v4.9 has the tag `latest_release`, the _actual_ release in use by Roko.li is the tag `v4.9.1` which contains a fix on de schema
- * WITHOUT this fix the database will crash _other_ instances (which is a but by itself obviously)
+ * WITHOUT this fix the database will crash _other_ instances (which is a bug by itself obviously)
  * 
  * This scripts removes and alters all tables/columns to fit the upstream state _before_ its migration scripts run
  * This will prevent ActiveRecord from updating schema.rb with the FCA fork changes.
