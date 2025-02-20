@@ -8,6 +8,15 @@ Foodsoft
 [![Docker Status](https://img.shields.io/docker/cloud/build/foodcoops/foodsoft.svg)](https://hub.docker.com/r/foodcoops/foodsoft)
 [![Documentation](https://img.shields.io/badge/yard-docs-blue.svg)](http://rubydoc.info/github/foodcoops/foodsoft)
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+FORK soley meant for providing a migration
+    from the fork [Foodsoft-adam]([foodcoop-adam](https://github.com/foodcoop-adam/foodsoft))
+    to [foodsoft upstream](https://github.com/foodcoops/foodsoft).
+
+See for migration details [here](./fcn/readme.md)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 Web-based software to manage a non-profit food coop (product catalog, ordering, accounting, job scheduling).
 
 A food cooperative is a group of people that buy food from suppliers of their own choosing. A collective do-it-yourself supermarket. Members  order their products online and collect them on a specified day. And all put in a bit of work to make that possible. Foodsoft facilitates the process.
@@ -34,7 +43,7 @@ Get a foodsoft dev-environment running in the browser with Gitpod
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/foodcoops/foodsoft)
 
-Follow these [instructions](doc/SETUP_DEVELOPMENT_GITPOD.md) to complete setup from within the Gitpod workspace. 
+Follow these [instructions](doc/SETUP_DEVELOPMENT_GITPOD.md) to complete setup from within the Gitpod workspace.
 
 Deploying
 ---------
