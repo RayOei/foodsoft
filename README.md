@@ -10,7 +10,7 @@ Foodsoft
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 FORK soley meant for providing a migration
-    from the fork [Foodsoft-adam]([foodcoop-adam](https://github.com/foodcoop-adam/foodsoft))
+    from the fork [Foodsoft-adam](https://github.com/foodcoop-adam/foodsoft)
     to [foodsoft upstream](https://github.com/foodcoops/foodsoft).
 
 See for migration details [here](./fcn/readme.md)
