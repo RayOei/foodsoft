@@ -760,13 +760,13 @@ de:
     order_fax:
       filename: Bestellung %{name}-%{date} - Fax
       rows:
-        - BestellNr.
-        - Menge
-        - Name
-        - Gebinde
-        - Einheit
-        - Preis/Einheit
-        - Summe
+      - BestellNr.
+      - Menge
+      - Name
+      - Gebinde
+      - Einheit
+      - Preis/Einheit
+      - Summe
       total: Gesamtpreis
     order_matrix:
       filename: Bestellung %{name}-%{date} - Sortiermatrix
