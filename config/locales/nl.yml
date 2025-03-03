@@ -2,6 +2,7 @@ nl:
   activerecord:
     attributes:
       article:
+        added_new_property: Dit is nieuw
         article_category: Categorie
         availability: Artikel leverbaar?
         availability_short: leverb.
@@ -632,7 +633,9 @@ nl:
       use_apple_points: Wanneer het appelpunten systeem is geactiveerd, kunnen leden slechts bestellen wanneer ze meewerken aan taken.
       use_boxfill: Wanneer dit aan staat, kunnen gebruikers aan het einde van de bestelfase hun bestelling alleen wijzigen als het de totale bestelling vergroot. Dit helpt om dozen te vullen. Bij de bestelling moet nog wel de dozen-vul-datum ingevuld worden.
       use_iban: Om leverancier en gebruiker een extra veld te geven voor het internationale bankrekeningnummer (IBAN).
+      use_financial_links: When enabled, options to create financial links will be shown, which can group associated financial transactions, invoices, and bank transactions. Also, options to create foodcoop transactions will be shown (transactions which aren't assigned to any ordergroup, but serve as balancing entries for double-entry accounting.)
       use_nick: Toon bijnamen in plaats van volledige naam. Controleer dat iedereen een bijnaam heeft wanneer je dit aanzet.
+      profile_data_public_by_default: When creating a new user, the pricacy options "Phone number / Email / Name is visible for other members" will be checked by default. If nicknames are disabled, name will be visible either way.
       use_self_service: Wanneer dit aan staat, kan iedereen zelf financiële transacties toevoegen.
       webstats_tracking_code: Tracking code voor bezoeker statistieken (zoals Piwik of Google analytics). Leeg laten als geen tracking gewenst is.
     keys:
@@ -691,7 +694,9 @@ nl:
       use_apple_points: Appelpunten
       use_boxfill: Dozen vullen fase
       use_iban: IBAN gebruiken
+      use_financial_links: Use financial links & foodcoop transactions
       use_nick: Bijnamen gebruiken
+      profile_data_public_by_default: Profile data visible to others by default
       use_self_service: Zelf-service
       webstats_tracking_code: Tracking code
     tabs:
@@ -756,13 +761,13 @@ nl:
     order_fax:
       filename: Bestelling %{name}-%{date} - Fax
       rows:
-        - Nummer
-        - Aantal
-        - Naam
-        - Colli
-        - Eenheid
-        - Prijs/eenh.
-        - Subtotaal
+      - Nummer
+      - Aantal
+      - Naam
+      - Colli
+      - Eenheid
+      - Prijs/eenh.
+      - Subtotaal
       total: Totaal
     order_matrix:
       filename: Bestelling %{name}-%{date} - Sorteermatrix
@@ -792,6 +797,8 @@ nl:
       confirm:
         clear: Afrekenen
         first_paragraph: 'Wanneer de bestelling afgerekend wordt, worden alle tegoeden van huishoudens bijgewerkt.<br />De tegoeden worden als volgt belast:'
+        create_financial_link: Create a common financial link for the new transactions.
+        create_foodcoop_transaction: Create a foodcoop transaction with the inverted sum (%{sum}).
         or_cancel: of terug naar balans
         title: Bestelling afrekenen
       edit_note:
@@ -919,6 +926,8 @@ nl:
         new_financial_transaction: Nieuwe financiële transactie
         title: Financiële link %{number}
         type: Type
+        remove_from_link: Remove from link
+        remove_from_link_confirm: This won't delete the transaction, but only remove it from the link. Do you want to proceed?
     financial_transactions:
       controller:
         create:
@@ -934,6 +943,7 @@ nl:
         last_updated_at: "(laatst bijgewerkt %{when} geleden)"
         new_transaction: Nieuwe transactie toevoegen
         title: Rekeningoverzicht voor %{name}
+        title_foodcoop: Foodcoop account statement
       index_collection:
         show_groups: Tegoeden
         title: Financiële transacties
