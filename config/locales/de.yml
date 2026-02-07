@@ -242,8 +242,8 @@ de:
         article:
           attributes:
             name:
-              taken: Name ist bereits vergeben
-              taken_with_unit: Name und Einheit sind bereits vergeben
+              taken: name is already taken
+              taken_with_unit: name and unit are already taken
         supplier:
           attributes:
             shared_sync_method:
@@ -510,9 +510,9 @@ de:
       title_edit: Artikel bearbeiten
       title_new: Neuen Artikel einfügen
     import_search_results:
-      action_import: importieren
-      already_imported: schon importiert
-      not_found: Keine Artikel gefunden
+      action_import: import
+      already_imported: imported
+      not_found: No articles found
     index:
       change_supplier: Lieferant wechseln
       download: Artikel herunterladen
@@ -763,10 +763,10 @@ de:
       - BestellNr.
       - Menge
       - Name
-      - Gebinde
+      - Gebindegröße
       - Einheit
       - Preis/Einheit
-      - Summe
+      - Subtotal
       total: Gesamtpreis
     order_matrix:
       filename: Bestellung %{name}-%{date} - Sortiermatrix
