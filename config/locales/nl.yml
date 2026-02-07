@@ -12,6 +12,7 @@ nl:
         fc_share: Foodcoop-marge
         fc_share_short: FC-marge
         gross_price: Brutoprijs
+        id: Foodsoft id
         manufacturer: Producent
         name: Naam
         note: Notitie
@@ -22,17 +23,42 @@ nl:
         supplier: Leverancier
         tax: BTW
         unit: Eenheid
+        custom_unit: Custom unit
         unit_quantity: Colligrootte
         unit_quantity_short: Colli
         units: Eenheden
+        supplier_order_unit: orderable from supplier per (unit)
+        ratios_to_supplier_order_unit: Content
+        minimum_order_quantity: Minimum order quantity
+        billing_unit: billed per (unit)
+        group_order_granularity: members can order per (amount)
+        group_order_unit: members can order per (unit)
+        price_unit: per (price unit)
+      article_unit:
+        code: Unit code according to the recommendation of the United Nations Economic Commission (UNECE)
+        code_short: Code
+        symbol: Symbol
+        description: Description
       article_category:
         description: Namen importeren
         name: Naam
-      article_price:
-        deposit: Statiegeld
-        price: Nettoprijs
-        tax: BTW
-        unit_quantity: Colligrootte
+      article_version:
+        deposit: Deposit
+        price: Price (net)
+        tax: VAT
+        unit_quantity: Unit quantity
+        availability: Is article available?
+        name: Name
+        note: Note
+        origin: Origin
+        manufacturer: Manufacturer
+        order_number: Order number
+        article_category: Category
+        supplier_order_unit: Orderable from supplier per
+        group_order_granularity: Orderable for members in
+        billing_unit: Will be billed per
+        price_unit: Price unit
+        minimum_order_quantity: Minimum order quantity
       bank_account:
         balance: Tegoed
         bank_gateway: Bank gateway
@@ -138,6 +164,7 @@ nl:
         updated_by: Laatst aangepast door
       order_article:
         article: Artikel
+        article_version: Article
         missing_units: Missende eenheden
         missing_units_short: Nodig
         quantity: Gewenst aantal artikelen
@@ -191,6 +218,10 @@ nl:
         order_howto: Hoe te bestellen
         phone: Telefoon
         phone2: Telefoon 2
+        remote_auto_sync: Perform synchronization automatically (daily)
+        remote_order_method: Order method
+        remote_order_url: Order URL
+        supplier_remote_source: Supplier remote source
         shared_sync_method: Hoe synchroniseren
         url: Homepage
       supplier_category:
@@ -239,11 +270,13 @@ nl:
     errors:
       has_many_left: is nog met een %{collection} verbonden!
       models:
-        article:
+        article_version:
           attributes:
             name:
-              taken: naam bestaat al
-              taken_with_unit: de combinatie van naam en eenheid bestaat al
+              taken: name is already taken
+              taken_with_unit: name and unit are already taken
+            minimum_order_quantity:
+              only_integer: Must be an integer if supplier order unit is a piece unit
         supplier:
           attributes:
             shared_sync_method:
@@ -254,6 +287,7 @@ nl:
               exclusion: gedane taken kunnen niet herhaald worden
     models:
       article: Artikel
+      article_version: Article
       article_category: Categorie
       bank_account: Bankrekening
       bank_gateway: Betalingsdienst
@@ -481,14 +515,12 @@ nl:
         notice: "Er zijn %{count} nieuwe artikelen opgeslagen."
       error_invalid: Er zijn artikelen die een fout hebben
       error_nosel: Geen artikelen geselecteerd
-      error_parse: "%{msg} … in regel %{line}"
       error_update: 'Er trad een fout op bij het bijwerken van artikel ''%{article}'': %{msg}'
       parse_upload:
         no_file: Een bestand om te uploaden kiezen.
         notice: "%{count} artikelen zijn geanalyseerd"
       sync:
-        notice: Catalogus is bijgewerkt
-        shared_alert: "%{supplier} is niet aan een externe database gekoppeld"
+        exceeds_shared_supplier_article_sync_limit: The remote supplier has too many articles to be synchronized with the current configuration ('%{sync_method}'), please configure to use '%{import_sync_method}' instead.
       update_all:
         notice: Alle artikelen en prijzen zijn bijgewerkt.
       update_sel:
@@ -498,6 +530,8 @@ nl:
         notice_unavail: Alle geselecteerde artikelen zijn onbeschikbaar gemaakt.
       update_sync:
         notice: Alle artikelen en prijzen zijn bijgewerkt.
+      complete_units_migration:
+        notice: Articles successfully migrated
     destroy_active_article:
       drop: verwijderen
       note: "%{article} is deel van een lopende bestelling en kan niet verwijderd worden. Het artikel graag eerst uit de bestelling(en) %{drop_link}."
@@ -509,14 +543,12 @@ nl:
     form:
       title_edit: Artikel bewerken
       title_new: Nieuw artikel toevoegen
-    import_search_results:
-      action_import: importeren
-      already_imported: geïmporteerd
-      not_found: Geen artikelen gevonden
+      per: per
     index:
       change_supplier: Leverancier wisselen
       download: Artikelen downloaden
       edit_all: Alles bewerken
+      migrate_units: Migrate old article units
       ext_db:
         import: Zoeken/importeren
         sync: Synchroniseren
@@ -530,6 +562,22 @@ nl:
       search_placeholder: Naam…
       title: Artikelen van %{supplier} (%{count})
       upload: Artikelen uploaden
+    prepare_units_migration:
+      explanation: |
+        It's highly recommended to download a backup before continuing:
+      title: Migrate articles of %{supplier}
+      download: Download articles backup
+      migrate_units: Next step
+    migrate_units:
+      title: Migrate articles of %{supplier}
+      explanation: |
+        This will try to migrate articles to their new, more versatile format. You may adapt the suggested changes before continuing if you see fit.
+      column_headers:
+        apply: Convert
+        original_plaintext_unit: Original plaintext unit
+        affected_articles: Affected articles
+        contains: Contains
+      run_migration: Run migration now
     model:
       error_in_use: "%{article} kan niet gewist worden, want deze is deel van een lopende bestelling!"
       error_nosel: Je hebt geen artikelen geselecteerd
@@ -567,8 +615,9 @@ nl:
         status: Status (x=overslaan)
       file_label: Kies een compatibel bestand uit
       options:
-        convert_units: Bestaande eenheden behouden, groothandelseenheid en prijs herberekenen (net als synchroniseren).
         outlist_absent: Artikelen die niet in het bestand voorkomen, verwijderen.
+        activate_unit_migration: "Re-enable unit migration."
+        delete_unavailable: "Delete unavailable articles."
       sample:
         juices: Sappen
         nuts: Noten
@@ -762,11 +811,10 @@ nl:
       rows:
       - Nummer
       - Aantal
-      - Naam
-      - Colli
-      - Eenheid
-      - Prijs/eenh.
-      - Subtotaal
+      - Unit
+      - Name
+      - Price/Unit
+      - Subtotal
       total: Totaal
     order_matrix:
       filename: Bestelling %{name}-%{date} - Sorteermatrix
@@ -783,6 +831,15 @@ nl:
     not_found:
       text: Deze pagina bestaat niet, sorry!
       title: Pagina niet gevonden
+    step_error: Enter a number >=%{min}, which is a multiple of %{granularity}.
+  feedback:
+    create:
+      notice: Your feedback was sent successfully. Thanks a lot!
+    new:
+      first_paragraph: Found a bug? Suggestions? Ideas? Reviews? We are happy to hear any feedback.
+      second_paragraph: Please be aware that the Foodsoft Team is only responsible for the maintenance of the software. For questions regarding the organisation of your Foodcoop, please contact the appropriate contact person.
+      send: Send
+      title: Give feedback
   finance:
     balancing:
       close:
@@ -1137,6 +1194,11 @@ nl:
     tasks:
       required_users: "Nog %{count} leden nodig!"
       task_title: "%{name} (%{duration}u)"
+    unit_conversion_fields:
+      title: Convert units
+      disabled_title: Unit cannot be converted
+      cancel: Cancel
+      apply: Apply
   home:
     apple_bar:
       desc: "Deze balk laat zien hoeveel taken je gedaan hebt per bestelhoeveelheid, vergeleken met het gemiddelde van de foodcoop.\nPraktisch: voor iedere %{amount} aan totale bestellingen moet je een taak te doen!"
@@ -1422,6 +1484,7 @@ nl:
       stock: Voorraad
       suppliers: Leveranciers/producten
       title: Producten
+      article_units: Article units
     dashboard: Dashboard
     finances:
       accounts: Ledenbetalingen
@@ -1483,6 +1546,7 @@ nl:
       heading: Bestelling voor %{name}
       name: Naam
       number: Nummer
+      unit: Unit
       to_address: Verzendadres
     finish:
       notice: De bestelling is gesloten.
@@ -1514,6 +1578,7 @@ nl:
       stock: Voorraad
       warning_ordered: 'Opgelet: rood gemarkeerde artikelen zijn al besteld door leden. Als je ze hier deselecteert, worden alle bestaande ledenbestellingen van deze artikelen verwijderd. Bevestig onderaan om hiermee verder te gaan.'
       warning_ordered_stock: 'Opgelet: rood gemarkeerde artikelen zijn al besteld of gekocht door leden. Als je ze hier deselecteert, worden alle bestaande ledenbestellingen/-aankopen van deze artikelen verwijderd, en worden ze niet afgerekend. Bevestig onderaan om hiermee verder te gaan.'
+      error_invalid: "The order contains errors."
     new:
       title: Nieuwe bestelling openen
     receive:
@@ -1600,6 +1665,15 @@ nl:
       ordered_desc: Hoeveel artikelen het lid besteld heeft (aantal + tolerantie)
       received: Ontvangen
       received_desc: Hoeveel artikelen het lid is toegewezen danwel heeft gekregen
+    article_fields_units:
+      custom_unit: Custom
+      unit: Unit
+      unit_ratios: Content
+      add_ratio: Add content
+      warn_about_needless_custom_unit: Refrain from using custom plain text units when there are apt units in the dropdown. (Choosing units from the dropdown allows for interoperability with other systems and enables automatically converting them into other units.)
+    article_unit_ratio:
+      remove: Remove content
+      per: per
     articles_by:
       price: Totaalprijs
       price_sum: Som
@@ -1659,6 +1733,8 @@ nl:
           price: "<ul><li>De prijs mag niet aangepast worden.</li><li>Indien nodig, %{stock_article_copy_link}.</li></ul>"
       supplier:
         min_order_quantity: De minimum bestelhoeveelheid wordt getoond bij het bestellen en is bedoeld om leden te motiveren genoeg te bestellen.
+        remote_order_method: How the order can be automatically sent to the supplier.
+        remote_order_url: A URL such as “ftp://user:password@example.org”.
       task:
         duration: Hoe lang de taak duurt, 1-3 uur.
         required_users: Hoeveel mensen zijn in totaal nodig?
@@ -1678,6 +1754,8 @@ nl:
         settings_group:
           messages: Berichten
           privacy: Privacy
+        article:
+          supplier_id: Supplier
     'no': 'Nee'
     options:
       settings:
@@ -1764,6 +1842,21 @@ nl:
       stock_changes: Verloop
     update:
       notice: Voorraadartikel "%{name}" is bijgewerkt.
+  article_units:
+    index:
+      search: Search for unit/symbol
+      only_recommended: Only recommended
+    rows:
+      request_translation: There is no translation available for this unit. If you think this unit might be of common use, click here to create a new GitHub issue.
+    create_link:
+      add: Add
+    destroy_link:
+      delete: Remove
+      confirm: Do you really want to remove this article unit? (Existing articles using this unit will not be altered, but it won't be possible to use it for new articles.)
+    create:
+      success: Article unit %{name} has been added successfully.
+    destroy:
+      success: Article unit %{name} has been removed successfully.
   suppliers:
     create:
       notice: Leverancier is aangemaakt.
@@ -1797,8 +1890,21 @@ nl:
       last_orders: Recente bestellingen
       new_delivery: Levering aanmaken
       show_deliveries: Alle leveringen tonen
+      share: Share
+      remove_share: Remove share
+      confirm_remove_share: Do you really want to stop sharing this supplier's articles? (If you later decide to start sharing them again, you'll have to resend the new link to all subscribers who you think should have access.)
     update:
       notice: Leverancier is bijgewerkt
+    import_search_results:
+      action_import: import
+      already_imported: imported
+      not_found: No articles found
+    remote_order_methods:
+      email: E-mail
+  supplier_shares:
+    share_link:
+      not_shared: Supplier's articles are currently not shared with anyone.
+      share_link_copied_to_clipboard: Share link has been copied to the clipboard.
   tasks:
     accept:
       notice: Je hebt de taak geaccepteerd
