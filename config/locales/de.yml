@@ -12,6 +12,7 @@ de:
         fc_share: FoodCoop-Aufschlag
         fc_share_short: FC-Aufschlag
         gross_price: Bruttopreis
+        id: Foodsoft id
         manufacturer: Produzent
         name: Name
         note: Notiz
@@ -22,17 +23,42 @@ de:
         supplier: Lieferantin
         tax: MwSt
         unit: Einheit
+        custom_unit: Custom unit
         unit_quantity: Gebindegröße
         unit_quantity_short: GebGr
         units: Gebinde
+        supplier_order_unit: orderable from supplier per (unit)
+        ratios_to_supplier_order_unit: Content
+        minimum_order_quantity: Minimum order quantity
+        billing_unit: billed per (unit)
+        group_order_granularity: members can order per (amount)
+        group_order_unit: members can order per (unit)
+        price_unit: per (price unit)
+      article_unit:
+        code: Unit code according to the recommendation of the United Nations Economic Commission (UNECE)
+        code_short: Code
+        symbol: Symbol
+        description: Description
       article_category:
         description: Beschreibung
         name: Name
-      article_price:
-        deposit: Pfand
-        price: Nettopreis
-        tax: MwSt
-        unit_quantity: Gebindegröße
+      article_version:
+        deposit: Deposit
+        price: Price (net)
+        tax: VAT
+        unit_quantity: Unit quantity
+        availability: Is article available?
+        name: Name
+        note: Note
+        origin: Origin
+        manufacturer: Manufacturer
+        order_number: Order number
+        article_category: Category
+        supplier_order_unit: Orderable from supplier per
+        group_order_granularity: Orderable for members in
+        billing_unit: Will be billed per
+        price_unit: Price unit
+        minimum_order_quantity: Minimum order quantity
       bank_account:
         balance: Kontostand
         bank_gateway: Bankgateway
@@ -138,6 +164,7 @@ de:
         updated_by: Zuletzt geändert von
       order_article:
         article: Artikel
+        article_version: Article
         missing_units: Fehlende Einheiten
         missing_units_short: Fehlend
         quantity: Gewünschte Einheiten
@@ -191,6 +218,10 @@ de:
         order_howto: Kurzanleitung Bestellen
         phone: Telefon
         phone2: Telefon 2
+        remote_auto_sync: Perform synchronization automatically (daily)
+        remote_order_method: Order method
+        remote_order_url: Order URL
+        supplier_remote_source: Supplier remote source
         shared_sync_method: Syncronisierungsmethode
         url: Webseite
       supplier_category:
@@ -239,11 +270,13 @@ de:
     errors:
       has_many_left: ist noch mit einem/r %{collection} verknüpft!
       models:
-        article:
+        article_version:
           attributes:
             name:
-              taken: Name ist bereits vergeben
-              taken_with_unit: Name und Einheit sind bereits vergeben
+              taken: name is already taken
+              taken_with_unit: name and unit are already taken
+            minimum_order_quantity:
+              only_integer: Must be an integer if supplier order unit is a piece unit
         supplier:
           attributes:
             shared_sync_method:
@@ -254,6 +287,7 @@ de:
               exclusion: erledigte Aufgaben können nicht wöchentlich wiederholt werden
     models:
       article: Artikel
+      article_version: Article
       article_category: Kategorie
       bank_account: Bankkonto
       bank_gateway: Bankgateway
@@ -481,14 +515,12 @@ de:
         notice: "Es wurden %{count} neue Artikel gespeichert."
       error_invalid: Artikel sind fehlerhaft
       error_nosel: Du hast keine Artikel ausgewählt
-      error_parse: "%{msg} ... in Zeile %{line}"
       error_update: 'Es trat ein Fehler beim Aktualisieren des Artikels ''%{article}'' auf: %{msg}'
       parse_upload:
         no_file: Bitte eine Datei zum hochladen auswählen.
         notice: "%{count} Artikel sind erfolgreich analysiert."
       sync:
-        notice: Der Katalog ist aktuell
-        shared_alert: "%{supplier} ist nicht mit einer externen Datenbank verknüpft."
+        exceeds_shared_supplier_article_sync_limit: The remote supplier has too many articles to be synchronized with the current configuration ('%{sync_method}'), please configure to use '%{import_sync_method}' instead.
       update_all:
         notice: Alle Artikel und Preise wurden aktualisiert
       update_sel:
@@ -498,6 +530,8 @@ de:
         notice_unavail: Alle gewählten Artikel wurden auf "nicht verfügbar" gesetzt
       update_sync:
         notice: Alle Artikel und Preise wurden aktualisiert
+      complete_units_migration:
+        notice: Articles successfully migrated
     destroy_active_article:
       drop: entfernen
       note: "%{article} wird in laufenden Bestellungen verwendet und kann nicht gelöscht werden. Bitte zuerst den Artikel aus den Bestellungen %{drop_link}."
@@ -509,14 +543,12 @@ de:
     form:
       title_edit: Artikel bearbeiten
       title_new: Neuen Artikel einfügen
-    import_search_results:
-      action_import: importieren
-      already_imported: schon importiert
-      not_found: Keine Artikel gefunden
+      per: per
     index:
       change_supplier: Lieferant wechseln
       download: Artikel herunterladen
       edit_all: Alle bearbeiten
+      migrate_units: Migrate old article units
       ext_db:
         import: Suchen/Importieren
         sync: Synchronisieren
@@ -530,6 +562,22 @@ de:
       search_placeholder: Name ...
       title: Artikel von %{supplier} (%{count})
       upload: Artikel hochladen
+    prepare_units_migration:
+      explanation: |
+        It's highly recommended to download a backup before continuing:
+      title: Migrate articles of %{supplier}
+      download: Download articles backup
+      migrate_units: Next step
+    migrate_units:
+      title: Migrate articles of %{supplier}
+      explanation: |
+        This will try to migrate articles to their new, more versatile format. You may adapt the suggested changes before continuing if you see fit.
+      column_headers:
+        apply: Convert
+        original_plaintext_unit: Original plaintext unit
+        affected_articles: Affected articles
+        contains: Contains
+      run_migration: Run migration now
     model:
       error_in_use: "%{article} kann nicht gelöscht werden. Der Artikel befindet sich in einer laufenden Bestellung!"
       error_nosel: Du hast keine Artikel ausgewählt
@@ -567,8 +615,9 @@ de:
         status: Status (x=ausgelistet)
       file_label: Bitte wähle eine kompatible Datei aus
       options:
-        convert_units: Derzeitige Einheiten beibehalten, berechne Mengeneinheit und Preis (wie Synchronisieren).
         outlist_absent: Artikel löschen, die nicht in der hochgeladenen Datei sind.
+        activate_unit_migration: "Re-enable unit migration."
+        delete_unavailable: "Delete unavailable articles."
       sample:
         juices: Säfte
         nuts: Nüsse
@@ -762,11 +811,10 @@ de:
       rows:
       - BestellNr.
       - Menge
+      - Unit
       - Name
-      - Gebinde
-      - Einheit
-      - Preis/Einheit
-      - Summe
+      - Price/Unit
+      - Subtotal
       total: Gesamtpreis
     order_matrix:
       filename: Bestellung %{name}-%{date} - Sortiermatrix
@@ -783,6 +831,15 @@ de:
     not_found:
       text: Diese Seite existiert anscheinend nicht. Entschuldigung!
       title: Seite nicht gefunden
+    step_error: Enter a number >=%{min}, which is a multiple of %{granularity}.
+  feedback:
+    create:
+      notice: Your feedback was sent successfully. Thanks a lot!
+    new:
+      first_paragraph: Found a bug? Suggestions? Ideas? Reviews? We are happy to hear any feedback.
+      second_paragraph: Please be aware that the Foodsoft Team is only responsible for the maintenance of the software. For questions regarding the organisation of your Foodcoop, please contact the appropriate contact person.
+      send: Send
+      title: Give feedback
   finance:
     balancing:
       close:
@@ -1137,6 +1194,11 @@ de:
     tasks:
       required_users: "Es fehlen %{count} Mitstreiterinnen!"
       task_title: "%{name} (%{duration}h)"
+    unit_conversion_fields:
+      title: Convert units
+      disabled_title: Unit cannot be converted
+      cancel: Cancel
+      apply: Apply
   home:
     apple_bar:
       desc: 'Abgebildet ist das Verhältnis von erledigten Aufgaben zu dem Bestellvolumen Deiner Bestellgruppe im Vergleich zum Durchschnitt in der Foodcoop. Konkret: Pro %{amount} Bestellsumme solltest Du eine Aufgabe machen!'
@@ -1424,6 +1486,7 @@ de:
       stock: Lager
       suppliers: Lieferanten/Artikel
       title: Artikel
+      article_units: Article units
     dashboard: Übersichtsseite
     finances:
       accounts: Konten verwalten
@@ -1485,6 +1548,7 @@ de:
       heading: Bestellung für %{name}
       name: Name
       number: Nummer
+      unit: Unit
       to_address: Versandaddresse
     finish:
       notice: Die Bestellung wurde beendet.
@@ -1516,6 +1580,7 @@ de:
       stock: Lager
       warning_ordered: 'Warnung: Die rot markierten Artikel wurden in der laufenden Bestellung bereits bestellt. Wenn Du sie hier abwählst, werden alle bestehenden Bestellungen dieses Artikels gelöscht.'
       warning_ordered_stock: 'Warnung: Die rot markierten Artikel wurden in der laufenden Lagerbestellung bereits bestellt bzw. gekauft. Wenn Du sie hier abwählst, werden alle bestehenden Bestellungen bzw. Käufe dieses Artikels gelöscht und nicht abgerechnet!'
+      error_invalid: "The order contains errors."
     new:
       title: Neue Bestellung anlegen
     receive:
@@ -1602,6 +1667,15 @@ de:
       ordered_desc: Anzahl der Artikel die durch das Mitglied bestellt wurden (Menge + Toleranz)
       received: Bekommen
       received_desc: Anzahl der Artikel die ein Mitglied erhält
+    article_fields_units:
+      custom_unit: Custom
+      unit: Unit
+      unit_ratios: Content
+      add_ratio: Add content
+      warn_about_needless_custom_unit: Refrain from using custom plain text units when there are apt units in the dropdown. (Choosing units from the dropdown allows for interoperability with other systems and enables automatically converting them into other units.)
+    article_unit_ratio:
+      remove: Remove content
+      per: per
     articles_by:
       price: Gesamtpreis
       price_sum: Summe
@@ -1661,6 +1735,8 @@ de:
           price: "<ul><li>Preisänderung gesperrt.</li><li>Bei Bedarf %{stock_article_copy_link}.</li></ul>"
       supplier:
         min_order_quantity: Die Mindestbestellmenge wird während der Bestellung angezeigt und soll motivieren
+        remote_order_method: How the order can be automatically sent to the supplier.
+        remote_order_url: A URL such as “ftp://user:password@example.org”.
       task:
         duration: Wie lange dauert die Aufgabe, 1-3 Stunden
         required_users: Wieviel Benutzer/innen werden insgesamt benötigt?
@@ -1680,6 +1756,8 @@ de:
         settings_group:
           messages: Nachrichten
           privacy: Privatsphäre
+        article:
+          supplier_id: Supplier
     'no': 'Nein'
     options:
       settings:
@@ -1766,6 +1844,21 @@ de:
       stock_changes: Verlauf des Lagerbestands
     update:
       notice: Lagerartikel »%{name}« aktualisiert.
+  article_units:
+    index:
+      search: Search for unit/symbol
+      only_recommended: Only recommended
+    rows:
+      request_translation: There is no translation available for this unit. If you think this unit might be of common use, click here to create a new GitHub issue.
+    create_link:
+      add: Add
+    destroy_link:
+      delete: Remove
+      confirm: Do you really want to remove this article unit? (Existing articles using this unit will not be altered, but it won't be possible to use it for new articles.)
+    create:
+      success: Article unit %{name} has been added successfully.
+    destroy:
+      success: Article unit %{name} has been removed successfully.
   suppliers:
     create:
       notice: Lieferant wurde erstellt
@@ -1799,8 +1892,21 @@ de:
       last_orders: Letzte Bestellungen
       new_delivery: Neue Lieferung anlegen
       show_deliveries: Zeige alle Lieferungen
+      share: Share
+      remove_share: Remove share
+      confirm_remove_share: Do you really want to stop sharing this supplier's articles? (If you later decide to start sharing them again, you'll have to resend the new link to all subscribers who you think should have access.)
     update:
       notice: Lieferant wurde aktualisiert
+    import_search_results:
+      action_import: import
+      already_imported: imported
+      not_found: No articles found
+    remote_order_methods:
+      email: E-mail
+  supplier_shares:
+    share_link:
+      not_shared: Supplier's articles are currently not shared with anyone.
+      share_link_copied_to_clipboard: Share link has been copied to the clipboard.
   tasks:
     accept:
       notice: Du hast die Aufgabe übernommen
