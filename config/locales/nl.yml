@@ -243,8 +243,8 @@ nl:
         article:
           attributes:
             name:
-              taken: naam bestaat al
-              taken_with_unit: de combinatie van naam en eenheid bestaat al
+              taken: name is already taken
+              taken_with_unit: name and unit are already taken
         supplier:
           attributes:
             shared_sync_method:
@@ -511,9 +511,9 @@ nl:
       title_edit: Artikel bewerken
       title_new: Nieuw artikel toevoegen
     import_search_results:
-      action_import: importeren
-      already_imported: geïmporteerd
-      not_found: Geen artikelen gevonden
+      action_import: import
+      already_imported: imported
+      not_found: No articles found
     index:
       change_supplier: Leverancier wisselen
       download: Artikelen downloaden
@@ -764,10 +764,10 @@ nl:
       - Nummer
       - Aantal
       - Naam
-      - Colli
+      - Colligrootte
       - Eenheid
-      - Prijs/eenh.
-      - Subtotaal
+      - Prijs/Eenheid
+      - Subtotal
       total: Totaal
     order_matrix:
       filename: Bestelling %{name}-%{date} - Sorteermatrix
